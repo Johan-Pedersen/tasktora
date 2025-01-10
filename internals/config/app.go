@@ -2,6 +2,8 @@ package config
 
 import (
 	"log"
+
+	"tasktora/internals/models"
 )
 
 /*
@@ -11,4 +13,5 @@ Like logging and DB connection pools
 type App struct {
 	ErrorLogger *log.Logger
 	InfoLogger  *log.Logger
+	TaskModel   models.ITaskModel
 }
