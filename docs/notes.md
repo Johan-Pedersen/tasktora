@@ -32,6 +32,18 @@
 - lets go repo
     - https://github.com/DataDavD/letsgo_snippetbox?tab=readme-ov-file
 
+
+## Database 
+
+- databasen hedder 'tasktora', holder tabel tasks 
+
+- user 'taskDev'@'localhost' med pass 'dev'
+
+- test database hedder 'test_tasktora'
+
+- test user 'taskTest'@'localhost' med pass 'test'
+
+
 ## Plan
 
 - webserver laves i golang 
@@ -149,3 +161,42 @@
     - logging metoderne kan bare tage app, eller en Logger som input
 
 
+
+## database Opsaetning
+
+- hvilke operationer er vigtigst
+    - read 
+        - Kommer an paa hvor mange records man vil laese og gemme af gangen.
+        - Vi kan hente alle records med det samme, og bare gemme dem i cookies. 
+    - write
+        - Man kan store changes saa man fylder en form for buffer inden man skriver til databasen.
+        - Man kan maaske store dem i en cookie for / inden man sender dem afsted
+    - update 
+        - Man kan shift tasks ind og ud 
+
+
+
+### opsaetning af sql database
+
+- brug adjecenty list modellen
+
+### database layer / API
+
+### lav model 
+
+- fields
+    - id 
+    - title 
+    - 
+
+### Insert + select funktioner
+
+### lav model 
+
+- Hvor binder vi os til mySql
+- Vi vil hellere inject mysql ind
+
+## elemeter til for '/'
+
+- hvordan tester man sql selects
+    - lav test database som man skriver selects i mod 

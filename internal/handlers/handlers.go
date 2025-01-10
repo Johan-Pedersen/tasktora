@@ -3,11 +3,10 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"tasktora/internal/config"
+	"tasktora/internal/middleware"
 
-	"tasktora/internals/config"
-	customlogger "tasktora/internals/customLogger"
-
-	"tasktora/internals/middleware"
+	customlogger "tasktora/internal/customLogger"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"

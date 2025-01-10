@@ -1,7 +1,15 @@
 # CallStack
 
-- dependency injection
-    - inject loggers
+- Lav test database insert script
+
+- Ser ikke ud til sql lsp'en virker
+
+- elemeter til for '/'
+    - GetAll
+    - InsertTask
+        - insert
+        - insertChild
+    - Update
 
 - Webserver der modtager post, get med noter og opdatere en database 
     - note model til at snakke med database 

@@ -3,9 +3,9 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"tasktora/internal/config"
 
-	"tasktora/internals/config"
-	customlogger "tasktora/internals/customLogger"
+	customlogger "tasktora/internal/customLogger"
 )
 
 func SecureHeaders(next http.Handler) http.Handler {

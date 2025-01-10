@@ -5,12 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"tasktora/internal/config"
+	"tasktora/internal/handlers"
+	"tasktora/internal/models"
 	"time"
 
-	"tasktora/internals/config"
-	customlogger "tasktora/internals/customLogger"
-	"tasktora/internals/handlers"
-	"tasktora/internals/models"
+	customlogger "tasktora/internal/customLogger"
 
 	_ "github.com/go-sql-driver/mysql" // New import
 )

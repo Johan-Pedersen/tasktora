@@ -2,8 +2,7 @@ package config
 
 import (
 	"log"
-
-	"tasktora/internals/models"
+	"tasktora/internal/models"
 )
 
 /*

@@ -6,8 +6,7 @@ import (
 	"net/http"
 	"os"
 	"runtime/debug"
-
-	"tasktora/internals/config"
+	"tasktora/internal/config"
 )
 
 func ServerError(app *config.App, w http.ResponseWriter, err error) {
