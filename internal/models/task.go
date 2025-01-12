@@ -11,6 +11,7 @@ type Task struct {
 	Note     string
 	Created  time.Time
 	ParentId sql.NullInt64
+	Level    int
 }
 
 type TaskModel struct {
@@ -23,15 +24,16 @@ type ITaskModel interface {
 }
 
 func (tm TaskModel) Get(id int) (*Task, error) {
-	stmt := `SELECT id, title, note, created, parent_id FROM tasks
-WHERE id = ?
+	stmt := `SELECT *
+  FROM tasks
+  WHERE id = ?
   `
 
 	row := tm.DB.QueryRow(stmt, id)
 
 	task := &Task{}
 
-	err := row.Scan(&task.Id, &task.Title, &task.Note, &task.Created, &task.ParentId)
+	err := row.Scan(&task.Id, &task.Title, &task.Note, &task.Created, &task.ParentId, &task.Level)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +86,7 @@ func (tm TaskModel) GetAll() ([]*Task, error) {
 	for rows.Next() {
 		task := &Task{}
 
-		err = rows.Scan(&task.Id, &task.Title, &task.Note, &task.Created, &task.ParentId)
+		err = rows.Scan(&task.Id, &task.Title, &task.Note, &task.Created, &task.ParentId, &task.Level)
 		if err != nil {
 			return nil, err
 		}

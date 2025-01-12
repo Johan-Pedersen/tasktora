@@ -27,6 +27,7 @@ func TestGetTask(t *testing.T) {
 				Id:       1,
 				Created:  created,
 				ParentId: sql.NullInt64{Valid: false},
+				Level:    1,
 			},
 		},
 		{
@@ -38,6 +39,7 @@ func TestGetTask(t *testing.T) {
 				Id:       3,
 				ParentId: sql.NullInt64{Int64: 1, Valid: true},
 				Created:  created,
+				Level:    2,
 			},
 		},
 		{
@@ -94,12 +96,14 @@ func TestGetAllTasks(t *testing.T) {
 				Note:    "Synger",
 				Created: created,
 				Id:      1,
+				Level:   1,
 			},
 			{
 				Title:   "fugl 2",
 				Note:    "flyver",
 				Created: created,
 				Id:      2,
+				Level:   1,
 			},
 			{
 				Title:    "fugl 3",
@@ -107,6 +111,7 @@ func TestGetAllTasks(t *testing.T) {
 				Created:  created,
 				Id:       3,
 				ParentId: sql.NullInt64{Int64: 1, Valid: true},
+				Level:    2,
 			},
 			{
 				Title:    "fugl 4",
@@ -114,6 +119,7 @@ func TestGetAllTasks(t *testing.T) {
 				Created:  created,
 				Id:       4,
 				ParentId: sql.NullInt64{Int64: 3, Valid: true},
+				Level:    3,
 			},
 			{
 				Title:    "fugl 5",
@@ -121,6 +127,7 @@ func TestGetAllTasks(t *testing.T) {
 				Created:  created,
 				Id:       5,
 				ParentId: sql.NullInt64{Int64: 1, Valid: true},
+				Level:    2,
 			},
 		}
 
