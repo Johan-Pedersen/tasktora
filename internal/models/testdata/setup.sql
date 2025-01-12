@@ -17,7 +17,6 @@ INSERT INTO tasks(title, note, created) VALUES(
   "flyver",
   '2025-01-01 10:00:00'
   );
-
 INSERT INTO tasks(title, note, created, parent_id) VALUES(
   "fugl 3",
   "Gaar",
