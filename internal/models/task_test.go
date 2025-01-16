@@ -55,15 +55,10 @@ func TestGetTask(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Call the newTestDB() helper function to get a connection pool to
-			// our test database. Calling this here -- inside t.Run() -- means
-			// that fresh database tables and data will be set up and torn down
-			// for each sub-test.
 			db := newTestDB(t)
-			// Create a new instance of the UserModel.
+
 			m := TaskModel{db}
-			// Call the UserModel.Exists() method and check that the return
-			// value and error match the expected values for the sub-test.
+
 			task, err := m.Get(tt.idInput)
 			assert.Equal(t, task, tt.want)
 			if task == nil {
@@ -79,15 +74,10 @@ func TestGetAllTasks(t *testing.T) {
 		log.Fatal(err)
 	}
 	t.Run("GetAllTasks())", func(t *testing.T) {
-		// Call the newTestDB() helper function to get a connection pool to
-		// our test database. Calling this here -- inside t.Run() -- means
-		// that fresh database tables and data will be set up and torn down
-		// for each sub-test.
 		db := newTestDB(t)
-		// Create a new instance of the UserModel.
+
 		m := TaskModel{db}
-		// Call the UserModel.Exists() method and check that the return
-		// value and error match the expected values for the sub-test.
+
 		tasks, err := m.GetAll()
 
 		expectedTasks := []*Task{
@@ -131,9 +121,90 @@ func TestGetAllTasks(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, &tasks, &expectedTasks)
+		assert.Equal(t, tasks, expectedTasks)
 		if tasks == nil {
 			assert.ErrNoRows(t, err)
 		}
 	})
+}
+
+func TestGetTaskAndSubTasks(t *testing.T) {
+	created, err := time.Parse("2006-01-02 15:04:05", "2025-01-01 10:00:00")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tests := []struct {
+		name    string
+		idInput int
+		want    []*Task
+	}{
+		{
+			name:    "Parent children",
+			idInput: 1,
+			want: []*Task{
+				{
+					Title:    "fugl 1",
+					Note:     "Synger",
+					Id:       1,
+					Created:  created,
+					ParentId: sql.NullInt64{Int64: 0, Valid: false},
+					Level:    1,
+				},
+				{
+					Title:    "fugl 3",
+					Note:     "Gaar",
+					Id:       3,
+					ParentId: sql.NullInt64{Int64: 1, Valid: true},
+					Created:  created,
+					Level:    2,
+				},
+				{
+					Title:    "fugl 5",
+					Note:     "sover",
+					Id:       5,
+					ParentId: sql.NullInt64{Int64: 1, Valid: true},
+					Created:  created,
+					Level:    2,
+				},
+				{
+					Title:    "fugl 4",
+					Note:     "danser",
+					Id:       4,
+					ParentId: sql.NullInt64{Int64: 3, Valid: true},
+					Created:  created,
+					Level:    3,
+				},
+			},
+		},
+		{
+			name:    "No children",
+			idInput: 2,
+			want: []*Task{
+				{
+					Title:    "fugl 2",
+					Note:     "flyver",
+					Id:       2,
+					ParentId: sql.NullInt64{Valid: false},
+					Created:  created,
+					Level:    1,
+				},
+			},
+		},
+		{
+			name:    "Non-existent ID",
+			idInput: 9,
+			want:    []*Task{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := newTestDB(t)
+
+			m := TaskModel{db}
+
+			tasks, _ := m.GetTaskAndSubTasks(tt.idInput)
+
+			assert.Equal(t, tasks, tt.want)
+		})
+	}
 }

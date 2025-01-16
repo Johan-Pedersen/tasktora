@@ -41,33 +41,49 @@ func (tm TaskModel) Get(id int) (*Task, error) {
 	return task, nil
 }
 
-// func (tm *TaskModel) GetChildren()(*[]Task, error){
-//
-//	stmt := `SELECT id, title, note, created, parent_id FROM tasks
-//
-// WHERE id = ?
-//
-//	  `
-//
-//		row := tm.DB.Query(stmt, id)
-//
-//		task := &Task{}
-//
-//		err := row.Scan(&task.Id, &task.Title, &task.Note, &task.Created, &task.ParentId)
-//		if err != nil {
-//			// If the query returns no rows, then row.Scan() will return a
-//			// sql.ErrNoRows error. We use the errors.Is() function check for that
-//			// error specifically, and return our own ErrNoRecord error
-//			// instead (we'll create this in a moment).
-//			if errors.Is(err, sql.ErrNoRows) {
-//				return nil, ErrNoRecord
-//			} else {
-//				return nil, err
-//			}
-//		}
-//		// If everything went OK then return the Snippet object.
-//		return task, nil
-//	}
+func (tm *TaskModel) GetTaskAndSubTasks(id int) ([]*Task, error) {
+	stmt := `WITH RECURSIVE cte AS (
+    (SELECT t.id, t.title, t.note, t.created, t.parent_id, 1 as level
+    FROM tasks t
+    WHERE t.id = ?)
+  union all
+    (SELECT this.id, this.title, this.note, this.created, this.parent_id, this.level
+    FROM cte prior
+    INNER JOIN tasks this ON 
+      this.parent_id = prior.id)
+)
+
+SELECT e.id, e.title, e.note, e.created, e.parent_id, e.level
+FROM cte e
+  `
+	rows, err := tm.DB.Query(stmt, id)
+	if err != nil {
+		return nil, err
+	}
+
+	tasks := []*Task{}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		task := &Task{}
+
+		err = rows.Scan(&task.Id, &task.Title, &task.Note, &task.Created, &task.ParentId, &task.Level)
+		if err != nil {
+			return nil, err
+		}
+
+		tasks = append(tasks, task)
+
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	// If everything went OK then return the Snippet object.
+	return tasks, nil
+}
 
 func (tm TaskModel) GetAll() ([]*Task, error) {
 	stmt := `SELECT *
