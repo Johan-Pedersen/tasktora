@@ -19,11 +19,13 @@ type TaskModel struct {
 }
 
 type ITaskModel interface {
-	Get(id int) (*Task, error)
-	GetAll() ([]*Task, error)
+	GetTask(id int) (*Task, error)
+	GetAllTasks() ([]*Task, error)
+	GetTaskAndSubTasks(id int) ([]*Task, error)
+	InsertTask(title, note string, parentId sql.NullInt64, level int) (int, error)
 }
 
-func (tm TaskModel) Get(id int) (*Task, error) {
+func (tm TaskModel) GetTask(id int) (*Task, error) {
 	stmt := `SELECT *
   FROM tasks
   WHERE id = ?
@@ -41,7 +43,7 @@ func (tm TaskModel) Get(id int) (*Task, error) {
 	return task, nil
 }
 
-func (tm *TaskModel) GetTaskAndSubTasks(id int) ([]*Task, error) {
+func (tm TaskModel) GetTaskAndSubTasks(id int) ([]*Task, error) {
 	stmt := `WITH RECURSIVE cte AS (
     (SELECT t.id, t.title, t.note, t.created, t.parent_id, 1 as level
     FROM tasks t
@@ -85,7 +87,7 @@ FROM cte e
 	return tasks, nil
 }
 
-func (tm TaskModel) GetAll() ([]*Task, error) {
+func (tm TaskModel) GetAllTasks() ([]*Task, error) {
 	stmt := `SELECT *
   FROM tasks 
   `
@@ -121,7 +123,7 @@ func (tm TaskModel) GetAll() ([]*Task, error) {
 
 func (tm TaskModel) InsertTask(title, note string, parentId sql.NullInt64, level int) (int, error) {
 	// Verify parent exists
-	_, err := tm.Get(int(parentId.Int64))
+	_, err := tm.GetTask(int(parentId.Int64))
 	if err != nil {
 		return 0, err
 	}

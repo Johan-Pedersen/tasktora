@@ -59,7 +59,7 @@ func TestGetTask(t *testing.T) {
 
 			m := TaskModel{db}
 
-			task, err := m.Get(tt.idInput)
+			task, err := m.GetTask(tt.idInput)
 			assert.Equal(t, task, tt.want)
 			if task == nil {
 				assert.ErrNoRows(t, err)
@@ -78,7 +78,7 @@ func TestGetAllTasks(t *testing.T) {
 
 		m := TaskModel{db}
 
-		tasks, err := m.GetAll()
+		tasks, err := m.GetAllTasks()
 
 		expectedTasks := []*Task{
 			{
@@ -270,7 +270,7 @@ func TestInsertTask(t *testing.T) {
 				assert.ErrNoRows(t, err)
 			} else {
 
-				task, _ := m.Get(id)
+				task, _ := m.GetTask(id)
 				want := tt.want
 				assert.Equal(t, task.Title, want.Title)
 				assert.Equal(t, task.Note, want.Note)

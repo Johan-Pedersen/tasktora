@@ -26,7 +26,7 @@ func Routes(app *config.App) http.Handler {
 func home(app *config.App) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tm := app.TaskModel
-		task, err := tm.GetAll()
+		task, err := tm.GetAllTasks()
 		if err != nil {
 			customlogger.ServerError(app, w, err)
 		}
