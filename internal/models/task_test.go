@@ -208,3 +208,76 @@ func TestGetTaskAndSubTasks(t *testing.T) {
 		})
 	}
 }
+
+func TestInsertTask(t *testing.T) {
+	tests := []struct {
+		name      string
+		taskInput Task
+		want      *Task
+	}{
+		{
+			name: "insert parent",
+			taskInput: Task{
+				Title:    "fugl 9",
+				Note:     "lober",
+				ParentId: sql.NullInt64{Valid: false},
+				Level:    1,
+			},
+			want: &Task{
+				Title:    "fugl 9",
+				Note:     "lober",
+				Id:       6,
+				ParentId: sql.NullInt64{Valid: false},
+				Level:    1,
+			},
+		},
+		{
+			name: "insert child",
+			taskInput: Task{
+				Title:    "fugl 10",
+				Note:     "Taenker",
+				ParentId: sql.NullInt64{Int64: 6, Valid: true},
+				Level:    2,
+			},
+			want: &Task{
+				Title:    "fugl 10",
+				Note:     "Taenker",
+				Id:       6,
+				ParentId: sql.NullInt64{Int64: 6, Valid: true},
+				Level:    2,
+			},
+		},
+		{
+			name: "insert child, but parent doesnt exist",
+			taskInput: Task{
+				Title:    "fugl 10",
+				Note:     "Taenker",
+				ParentId: sql.NullInt64{Int64: 7, Valid: true},
+				Level:    2,
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := newTestDB(t)
+
+			m := TaskModel{db}
+
+			ti := tt.taskInput
+			id, err := m.InsertTask(ti.Title, ti.Note, ti.ParentId, ti.Level)
+			if id == 0 {
+				assert.ErrNoRows(t, err)
+			} else {
+
+				task, _ := m.Get(id)
+				want := tt.want
+				assert.Equal(t, task.Title, want.Title)
+				assert.Equal(t, task.Note, want.Note)
+				assert.Equal(t, task.Level, want.Level)
+				assert.Equal(t, task.ParentId, want.ParentId)
+				assert.Equal(t, task.Id, want.Id)
+			}
+		})
+	}
+}

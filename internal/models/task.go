@@ -118,3 +118,26 @@ func (tm TaskModel) GetAll() ([]*Task, error) {
 	// If everything went OK then return the Snippet object.
 	return tasks, nil
 }
+
+func (tm TaskModel) InsertTask(title, note string, parentId sql.NullInt64, level int) (int, error) {
+	// Verify parent exists
+	_, err := tm.Get(int(parentId.Int64))
+	if err != nil {
+		return 0, err
+	}
+
+	insStmt := `INSERT INTO tasks (title, note, created, parent_id, level)
+VALUES(?, ?, UTC_TIMESTAMP(),? , ?)`
+
+	result, err := tm.DB.Exec(insStmt, title, note, parentId, level)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
