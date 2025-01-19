@@ -23,6 +23,7 @@ type ITaskModel interface {
 	GetAllTasks() ([]*Task, error)
 	GetTaskAndSubTasks(id int) ([]*Task, error)
 	InsertTask(title, note string, parentId sql.NullInt64, level int) (int, error)
+	UpdateTask(title, note string, parentId sql.NullInt64, level int) (int, error)
 }
 
 func (tm TaskModel) GetTask(id int) (*Task, error) {
@@ -137,6 +138,21 @@ VALUES(?, ?, UTC_TIMESTAMP(),? , ?)`
 	}
 
 	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+func (tm TaskModel) UpdateTask(id int, title, note string, parentId sql.NullInt64, level int) (int, error) {
+	// Verify parent exists
+
+	stmt := `UPDATE tasks 
+  SET title = ?, note = ?, parent_id = ?, level = ?
+  WHERE id = ?`
+
+	_, err := tm.DB.Exec(stmt, title, note, parentId, level, id)
 	if err != nil {
 		return 0, err
 	}

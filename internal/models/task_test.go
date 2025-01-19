@@ -281,3 +281,99 @@ func TestInsertTask(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateTask(t *testing.T) {
+	created, err := time.Parse("2006-01-02 15:04:05", "2025-01-01 10:00:00")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tests := []struct {
+		name  string
+		input struct {
+			id      int
+			updTask Task
+		}
+		want *Task
+	}{
+		{
+			name: "update title",
+			input: struct {
+				id      int
+				updTask Task
+			}{
+				id: 1,
+				updTask: Task{
+					Title:    "fugl 1, updated",
+					Note:     "Synger",
+					Id:       1,
+					ParentId: sql.NullInt64{Valid: false},
+					Level:    1,
+				},
+			},
+			want: &Task{
+				Title:    "fugl 1, updated",
+				Note:     "Synger",
+				Id:       1,
+				Created:  created,
+				ParentId: sql.NullInt64{Valid: false},
+				Level:    1,
+			},
+		},
+		{
+			name: "update parentId",
+			input: struct {
+				id      int
+				updTask Task
+			}{
+				id: 3,
+				updTask: Task{
+					Title:    "fugl 3",
+					Note:     "Gaar",
+					Id:       3,
+					ParentId: sql.NullInt64{Int64: 2, Valid: true},
+					Level:    2,
+				},
+			},
+			want: &Task{
+				Title:    "fugl 3",
+				Note:     "Gaar",
+				Id:       3,
+				ParentId: sql.NullInt64{Int64: 2, Valid: true},
+				Created:  created,
+				Level:    2,
+			},
+		},
+		{
+			name: "Non-existent ID",
+			input: struct {
+				id      int
+				updTask Task
+			}{
+				id: 9,
+				updTask: Task{
+					Title:    "fugl 3",
+					Note:     "Gaar",
+					Id:       3,
+					ParentId: sql.NullInt64{Int64: 2, Valid: true},
+					Level:    2,
+				},
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := newTestDB(t)
+
+			m := TaskModel{db}
+
+			updTask := tt.input.updTask
+			m.UpdateTask(tt.input.id, updTask.Title, updTask.Note, updTask.ParentId, updTask.Level)
+			task, err := m.GetTask(tt.input.id)
+			assert.Equal(t, task, tt.want)
+			if task == nil {
+				assert.ErrNoRows(t, err)
+			}
+		})
+	}
+}
