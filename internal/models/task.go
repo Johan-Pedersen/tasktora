@@ -23,7 +23,11 @@ type ITaskModel interface {
 	GetAllTasks() ([]*Task, error)
 	GetTaskAndSubTasks(id int) ([]*Task, error)
 	InsertTask(title, note string, parentId sql.NullInt64, level int) (int, error)
-	UpdateTask(title, note string, parentId sql.NullInt64, level int) (int, error)
+	UpdateTask(id int, title, note string, parentId sql.NullInt64, level int) (int, error)
+	UpdateTaskTitle(id int, title string) (int, error)
+	UpdateTaskNote(id int, note string) (int, error)
+	UpdateTaskParentId(id int, parentId sql.NullInt64) (int, error)
+	UpdateTaskLvl(id int, level int) (int, error)
 }
 
 func (tm TaskModel) GetTask(id int) (*Task, error) {
@@ -153,6 +157,66 @@ func (tm TaskModel) UpdateTask(id int, title, note string, parentId sql.NullInt6
   WHERE id = ?`
 
 	_, err := tm.DB.Exec(stmt, title, note, parentId, level, id)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+func (tm TaskModel) UpdateTaskTitle(id int, title string) (int, error) {
+	// Verify parent exists
+
+	stmt := `UPDATE tasks 
+  SET title = ?
+  WHERE id = ?`
+
+	_, err := tm.DB.Exec(stmt, title, id)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+func (tm TaskModel) UpdateTaskNote(id int, note string) (int, error) {
+	// Verify parent exists
+
+	stmt := `UPDATE tasks 
+  SET note = ?
+  WHERE id = ?`
+
+	_, err := tm.DB.Exec(stmt, note)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+func (tm TaskModel) UpdateTaskParent(id int, parentId sql.NullInt64) (int, error) {
+	// Verify parent exists
+
+	stmt := `UPDATE tasks 
+  SET parent_id = ?
+  WHERE id = ?`
+
+	_, err := tm.DB.Exec(stmt, parentId, id)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+func (tm TaskModel) UpdateTaskLvl(id int, level int) (int, error) {
+	// Verify parent exists
+
+	stmt := `UPDATE tasks 
+  SET level = ?
+  WHERE id = ?`
+
+	_, err := tm.DB.Exec(stmt, id)
 	if err != nil {
 		return 0, err
 	}
